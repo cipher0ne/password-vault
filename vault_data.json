@@ -1,0 +1,23 @@
+{
+    "users": {
+        "test@example.org": {
+            "password_hash": "58b7b25146cfefc526c33c6a050213ad8e55daa1ca4bcc196c10f2030e4a3a84",
+            "passwords": [
+                {
+                    "name": "1",
+                    "username": "2",
+                    "password": "3",
+                    "url": "123.com",
+                    "custom_order": 1
+                },
+                {
+                    "name": "teams",
+                    "username": "login",
+                    "password": "haslo",
+                    "url": "teams.com",
+                    "custom_order": 0
+                }
+            ]
+        }
+    }
+}

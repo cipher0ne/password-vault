@@ -16,9 +16,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QListView,
-    QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLineEdit,
+    QListView, QMainWindow, QMenu, QMenuBar,
+    QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -43,15 +44,6 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.label = QLabel(self.centralwidget)
-        self.label.setObjectName(u"label")
-        self.label.setMinimumSize(QSize(0, 0))
-        font = QFont()
-        font.setPointSize(12)
-        self.label.setFont(font)
-
-        self.horizontalLayout_2.addWidget(self.label)
-
         self.label_2 = QLabel(self.centralwidget)
         self.label_2.setObjectName(u"label_2")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
@@ -59,18 +51,20 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
         self.label_2.setSizePolicy(sizePolicy)
+        font = QFont()
+        font.setPointSize(12)
         self.label_2.setFont(font)
 
         self.horizontalLayout_2.addWidget(self.label_2)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.pushButton = QPushButton(self.centralwidget)
         self.pushButton.setObjectName(u"pushButton")
         self.pushButton.setFont(font)
 
-        self.verticalLayout.addWidget(self.pushButton)
+        self.horizontalLayout_2.addWidget(self.pushButton)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -94,6 +88,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.lineEdit = QLineEdit(self.centralwidget)
+        self.lineEdit.setObjectName(u"lineEdit")
+        self.lineEdit.setFont(font)
+
+        self.verticalLayout_2.addWidget(self.lineEdit)
+
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.pushButton_4 = QPushButton(self.centralwidget)
@@ -121,6 +121,13 @@ class Ui_MainWindow(object):
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_3)
+
+        self.pushButton_2 = QPushButton(self.centralwidget)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+        icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.FormatJustifyFill))
+        self.pushButton_2.setIcon(icon)
+
+        self.horizontalLayout_4.addWidget(self.pushButton_2)
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
@@ -170,13 +177,14 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Password manager", None))
         self.actionRemove_all_passwords.setText(QCoreApplication.translate("MainWindow", u"Remove all passwords", None))
-        self.label.setText(QCoreApplication.translate("MainWindow", u"Account:", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"<username>", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Log out", None))
         self.pushButton_7.setText(QCoreApplication.translate("MainWindow", u"Vault", None))
         self.pushButton_6.setText(QCoreApplication.translate("MainWindow", u"Password generator", None))
+        self.lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search", None))
         self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Remove", None))
+        self.pushButton_2.setText("")
         self.menuAbout.setTitle(QCoreApplication.translate("MainWindow", u"About", None))
         self.menuRemove_all_saved_passwords.setTitle(QCoreApplication.translate("MainWindow", u"Misc.", None))
     # retranslateUi

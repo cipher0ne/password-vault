@@ -82,27 +82,11 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addWidget(self.pushButton)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.label = QLabel(Dialog)
-        self.label.setObjectName(u"label")
+        self.pushButton_2 = QPushButton(Dialog)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.pushButton_2.setFont(font1)
 
-        self.horizontalLayout.addWidget(self.label)
-
-        self.label_2 = QLabel(Dialog)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setStyleSheet(u"QLabel {\n"
-"    color: #0388fc;\n"
-"}\n"
-"QLabel:hover {\n"
-"    text-decoration: underline;\n"
-"}\n"
-"")
-
-        self.horizontalLayout.addWidget(self.label_2)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout.addWidget(self.pushButton_2)
 
 
         self.verticalLayout_2.addLayout(self.verticalLayout)
@@ -135,7 +119,6 @@ class Ui_Dialog(object):
         self.lineEdit_3.setPlaceholderText(QCoreApplication.translate("Dialog", u"Repeat password", None))
         self.label_3.setText(QCoreApplication.translate("Dialog", u"<html><head/><body><p align=\"center\">Your password should consist of at least 12 characters, large and small letters, numbers and special characters. Spaces are not allowed.</p></body></html>", None))
         self.pushButton.setText(QCoreApplication.translate("Dialog", u"Sign up", None))
-        self.label.setText(QCoreApplication.translate("Dialog", u"Do you have an account already?", None))
-        self.label_2.setText(QCoreApplication.translate("Dialog", u"login", None))
+        self.pushButton_2.setText(QCoreApplication.translate("Dialog", u"Log in", None))
     # retranslateUi
 

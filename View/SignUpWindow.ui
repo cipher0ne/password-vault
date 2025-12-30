@@ -126,31 +126,16 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Do you have an account already?</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-    color: #0388fc;
-}
-QLabel:hover {
-    text-decoration: underline;
-}
-</string>
-             </property>
-             <property name="text">
-              <string>login</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QPushButton" name="pushButton_2">
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Log in</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
