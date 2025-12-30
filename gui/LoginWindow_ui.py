@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'LoginWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.1
+## Created by: Qt User Interface Compiler version 6.10.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -23,13 +23,12 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(352, 371)
-        self.layoutWidget = QWidget(Dialog)
-        self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(10, 10, 332, 351))
-        self.horizontalLayout_2 = QHBoxLayout(self.layoutWidget)
+        Dialog.resize(250, 371)
+        Dialog.setMinimumSize(QSize(250, 370))
+        self.horizontalLayout_3 = QHBoxLayout(Dialog)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
@@ -42,7 +41,7 @@ class Ui_Dialog(object):
 
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.label_4 = QLabel(self.layoutWidget)
+        self.label_4 = QLabel(Dialog)
         self.label_4.setObjectName(u"label_4")
         font = QFont()
         font.setPointSize(16)
@@ -50,7 +49,7 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addWidget(self.label_4)
 
-        self.lineEdit = QLineEdit(self.layoutWidget)
+        self.lineEdit = QLineEdit(Dialog)
         self.lineEdit.setObjectName(u"lineEdit")
         font1 = QFont()
         font1.setPointSize(12)
@@ -58,19 +57,19 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addWidget(self.lineEdit)
 
-        self.checkBox = QCheckBox(self.layoutWidget)
+        self.checkBox = QCheckBox(Dialog)
         self.checkBox.setObjectName(u"checkBox")
         self.checkBox.setEnabled(False)
 
         self.verticalLayout.addWidget(self.checkBox)
 
-        self.lineEdit_2 = QLineEdit(self.layoutWidget)
+        self.lineEdit_2 = QLineEdit(Dialog)
         self.lineEdit_2.setObjectName(u"lineEdit_2")
         self.lineEdit_2.setFont(font1)
 
         self.verticalLayout.addWidget(self.lineEdit_2)
 
-        self.label_3 = QLabel(self.layoutWidget)
+        self.label_3 = QLabel(Dialog)
         self.label_3.setObjectName(u"label_3")
         self.label_3.setEnabled(True)
         self.label_3.setStyleSheet(u"QLabel:hover {\n"
@@ -80,7 +79,7 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addWidget(self.label_3)
 
-        self.pushButton = QPushButton(self.layoutWidget)
+        self.pushButton = QPushButton(Dialog)
         self.pushButton.setObjectName(u"pushButton")
         self.pushButton.setFont(font1)
 
@@ -88,12 +87,12 @@ class Ui_Dialog(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.label = QLabel(self.layoutWidget)
+        self.label = QLabel(Dialog)
         self.label.setObjectName(u"label")
 
         self.horizontalLayout.addWidget(self.label)
 
-        self.label_2 = QLabel(self.layoutWidget)
+        self.label_2 = QLabel(Dialog)
         self.label_2.setObjectName(u"label_2")
         self.label_2.setStyleSheet(u"QLabel {\n"
 "    color: #0388fc;\n"
@@ -123,20 +122,23 @@ class Ui_Dialog(object):
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
 
 
+        self.horizontalLayout_3.addLayout(self.horizontalLayout_2)
+
+
         self.retranslateUi(Dialog)
 
         QMetaObject.connectSlotsByName(Dialog)
     # setupUi
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Sign up", None))
+        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Log in", None))
         self.label_4.setText(QCoreApplication.translate("Dialog", u"<html><head/><body><p align=\"center\">Welcome! Please log in</p></body></html>", None))
         self.lineEdit.setPlaceholderText(QCoreApplication.translate("Dialog", u"E-mail", None))
         self.checkBox.setText(QCoreApplication.translate("Dialog", u"Remember my e-mail", None))
         self.lineEdit_2.setPlaceholderText(QCoreApplication.translate("Dialog", u"Password", None))
         self.label_3.setText(QCoreApplication.translate("Dialog", u"<html><head/><body><p>Reset password</p></body></html>", None))
         self.pushButton.setText(QCoreApplication.translate("Dialog", u"Log in", None))
-        self.label.setText(QCoreApplication.translate("Dialog", u"I don't have an account yet", None))
-        self.label_2.setText(QCoreApplication.translate("Dialog", u"<html><head/><body><p>register</p></body></html>", None))
+        self.label.setText(QCoreApplication.translate("Dialog", u"If you don't have an account yet,", None))
+        self.label_2.setText(QCoreApplication.translate("Dialog", u"<html><head/><body><p>sign up</p></body></html>", None))
     # retranslateUi
 
