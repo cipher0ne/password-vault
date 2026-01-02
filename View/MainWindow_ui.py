@@ -16,10 +16,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLineEdit,
-    QListView, QMainWindow, QMenu, QMenuBar,
-    QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QHBoxLayout, QLabel,
+    QLineEdit, QListView, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -46,7 +46,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.label_2 = QLabel(self.centralwidget)
         self.label_2.setObjectName(u"label_2")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
@@ -59,6 +59,11 @@ class Ui_MainWindow(object):
 
         self.pushButton = QPushButton(self.centralwidget)
         self.pushButton.setObjectName(u"pushButton")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
+        self.pushButton.setSizePolicy(sizePolicy1)
         self.pushButton.setFont(font)
 
         self.horizontalLayout_2.addWidget(self.pushButton)
@@ -69,17 +74,26 @@ class Ui_MainWindow(object):
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.pushButton_7 = QPushButton(self.centralwidget)
+        self.buttonGroup = QButtonGroup(MainWindow)
+        self.buttonGroup.setObjectName(u"buttonGroup")
+        self.buttonGroup.setExclusive(True)
+        self.buttonGroup.addButton(self.pushButton_7)
         self.pushButton_7.setObjectName(u"pushButton_7")
+        self.pushButton_7.setEnabled(True)
         self.pushButton_7.setMinimumSize(QSize(160, 0))
         self.pushButton_7.setFont(font)
+        self.pushButton_7.setCheckable(True)
+        self.pushButton_7.setChecked(True)
 
         self.horizontalLayout.addWidget(self.pushButton_7)
 
         self.pushButton_6 = QPushButton(self.centralwidget)
+        self.buttonGroup.addButton(self.pushButton_6)
         self.pushButton_6.setObjectName(u"pushButton_6")
-        self.pushButton_6.setEnabled(False)
+        self.pushButton_6.setEnabled(True)
         self.pushButton_6.setMinimumSize(QSize(160, 0))
         self.pushButton_6.setFont(font)
+        self.pushButton_6.setCheckable(True)
 
         self.horizontalLayout.addWidget(self.pushButton_6)
 
@@ -98,11 +112,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.pushButton_4 = QPushButton(self.centralwidget)
         self.pushButton_4.setObjectName(u"pushButton_4")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.pushButton_4.sizePolicy().hasHeightForWidth())
-        self.pushButton_4.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.pushButton_4.sizePolicy().hasHeightForWidth())
+        self.pushButton_4.setSizePolicy(sizePolicy2)
         self.pushButton_4.setMinimumSize(QSize(60, 0))
         self.pushButton_4.setMaximumSize(QSize(60, 16777215))
 
@@ -111,8 +125,8 @@ class Ui_MainWindow(object):
         self.pushButton_3 = QPushButton(self.centralwidget)
         self.pushButton_3.setObjectName(u"pushButton_3")
         self.pushButton_3.setEnabled(False)
-        sizePolicy1.setHeightForWidth(self.pushButton_3.sizePolicy().hasHeightForWidth())
-        self.pushButton_3.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.pushButton_3.sizePolicy().hasHeightForWidth())
+        self.pushButton_3.setSizePolicy(sizePolicy2)
         self.pushButton_3.setMinimumSize(QSize(60, 0))
         self.pushButton_3.setMaximumSize(QSize(60, 16777215))
 
@@ -134,11 +148,11 @@ class Ui_MainWindow(object):
 
         self.listView = QListView(self.centralwidget)
         self.listView.setObjectName(u"listView")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.listView.sizePolicy().hasHeightForWidth())
-        self.listView.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.listView.sizePolicy().hasHeightForWidth())
+        self.listView.setSizePolicy(sizePolicy3)
 
         self.verticalLayout_2.addWidget(self.listView)
 
@@ -175,7 +189,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Password manager", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Password Vault", None))
         self.actionRemove_all_passwords.setText(QCoreApplication.translate("MainWindow", u"Remove all passwords", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"<username>", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Log out", None))

@@ -53,8 +53,10 @@ class Ui_Dialog(object):
         self.lineEdit = QLineEdit(self.groupBox)
         self.lineEdit.setObjectName(u"lineEdit")
         self.lineEdit.setGeometry(QRect(10, 30, 231, 31))
+        self.lineEdit.setMinimumSize(QSize(231, 31))
+        self.lineEdit.setMaximumSize(QSize(231, 31))
         font = QFont()
-        font.setPointSize(16)
+        font.setPointSize(12)
         self.lineEdit.setFont(font)
 
         self.verticalLayout.addWidget(self.groupBox)
@@ -68,6 +70,8 @@ class Ui_Dialog(object):
         self.lineEdit_2 = QLineEdit(self.groupBox_2)
         self.lineEdit_2.setObjectName(u"lineEdit_2")
         self.lineEdit_2.setGeometry(QRect(10, 30, 231, 31))
+        self.lineEdit_2.setMinimumSize(QSize(231, 31))
+        self.lineEdit_2.setMaximumSize(QSize(231, 31))
         self.lineEdit_2.setFont(font)
 
         self.verticalLayout.addWidget(self.groupBox_2)
@@ -81,6 +85,8 @@ class Ui_Dialog(object):
         self.lineEdit_3 = QLineEdit(self.groupBox_3)
         self.lineEdit_3.setObjectName(u"lineEdit_3")
         self.lineEdit_3.setGeometry(QRect(10, 30, 231, 31))
+        self.lineEdit_3.setMinimumSize(QSize(231, 31))
+        self.lineEdit_3.setMaximumSize(QSize(231, 31))
         self.lineEdit_3.setFont(font)
 
         self.verticalLayout.addWidget(self.groupBox_3)
@@ -94,6 +100,8 @@ class Ui_Dialog(object):
         self.lineEdit_4 = QLineEdit(self.groupBox_4)
         self.lineEdit_4.setObjectName(u"lineEdit_4")
         self.lineEdit_4.setGeometry(QRect(10, 30, 231, 31))
+        self.lineEdit_4.setMinimumSize(QSize(231, 31))
+        self.lineEdit_4.setMaximumSize(QSize(231, 31))
         self.lineEdit_4.setFont(font)
 
         self.verticalLayout.addWidget(self.groupBox_4)
@@ -102,15 +110,13 @@ class Ui_Dialog(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.pushButton_2 = QPushButton(Dialog)
         self.pushButton_2.setObjectName(u"pushButton_2")
-        font1 = QFont()
-        font1.setPointSize(12)
-        self.pushButton_2.setFont(font1)
+        self.pushButton_2.setFont(font)
 
         self.horizontalLayout.addWidget(self.pushButton_2)
 
         self.pushButton = QPushButton(Dialog)
         self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setFont(font1)
+        self.pushButton.setFont(font)
 
         self.horizontalLayout.addWidget(self.pushButton)
 

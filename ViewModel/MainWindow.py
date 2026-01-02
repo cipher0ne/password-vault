@@ -1,30 +1,64 @@
-from PySide6.QtWidgets import QMainWindow, QMessageBox, QListWidget, QListWidgetItem, QMenu
-from PySide6.QtCore import QSize
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QListWidget, QListWidgetItem, QMenu, QStackedWidget, QWidget, QVBoxLayout, QHBoxLayout, QSpacerItem, QSizePolicy
+from PySide6.QtCore import QSize, Signal, QSettings
+from PySide6.QtGui import QActionGroup
 from View.MainWindow_ui import Ui_MainWindow
 from ViewModel.PasswordItemWidget import PasswordItemWidget
+from ViewModel.PasswordGeneratorWidget import PasswordGeneratorWidget
 
 
 class MainWindow(QMainWindow):
     """Main window ViewModel"""
+    
+    logout_requested = Signal()  # Signal emitted when user logs out
     
     def __init__(self, model, parent=None):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.model = model
+        self.settings = QSettings("PasswordVault", "MainWindow")
         
-        # Replace QListView with QListWidget for custom items
+        # Create stacked widget to replace verticalLayout_2 content
+        self.stacked_widget = QStackedWidget()
+        
+        # Page 0: Vault view - reparent existing widgets
+        self.vault_widget = QWidget()
+        vault_layout = QVBoxLayout(self.vault_widget)
+        vault_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Move existing widgets from UI to vault layout
+        vault_layout.addWidget(self.ui.lineEdit)  # Search bar
+        
+        # Add button row
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.ui.pushButton_4)  # Add button
+        button_layout.addWidget(self.ui.pushButton_3)  # Remove button
+        button_layout.addItem(QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        button_layout.addWidget(self.ui.pushButton_2)  # Sort button
+        vault_layout.addLayout(button_layout)
+        
+        # Replace QListView with QListWidget
         self.list_widget = QListWidget()
         self.list_widget.setSpacing(2)
-        # Replace the listView in the layout
-        layout = self.ui.verticalLayout_2
-        old_list = self.ui.listView
-        layout.replaceWidget(old_list, self.list_widget)
-        old_list.deleteLater()
-        self.ui.listView = self.list_widget
+        self.ui.listView.setParent(None)  # Remove old list view
+        vault_layout.addWidget(self.list_widget)
         
-        # Current sort type and search query
-        self.current_sort = "custom"  # Options: "custom", "alphabetical_asc", "alphabetical_desc"
+        self.stacked_widget.addWidget(self.vault_widget)
+        
+        # Page 1: Password Generator view
+        self.generator_widget = PasswordGeneratorWidget()
+        self.stacked_widget.addWidget(self.generator_widget)
+        
+        # Clear verticalLayout_2 and add stacked widget
+        while self.ui.verticalLayout_2.count():
+            child = self.ui.verticalLayout_2.takeAt(0)
+            if child.widget():
+                child.widget().setParent(None)
+        
+        self.ui.verticalLayout_2.addWidget(self.stacked_widget)
+        
+        # Load saved sort type
+        self.current_sort = self.settings.value("sortType", "custom", type=str)
         self.search_query = ""
         self.selected_index = -1
         
@@ -38,6 +72,10 @@ class MainWindow(QMainWindow):
         self.ui.pushButton_3.clicked.connect(self.remove_selected_item)
         self.ui.pushButton_2.clicked.connect(self.show_sort_menu)
         
+        # Connect view switching buttons
+        self.ui.pushButton_7.clicked.connect(lambda: self.switch_view(0))  # Vault button
+        self.ui.pushButton_6.clicked.connect(lambda: self.switch_view(1))  # Password generator button
+        
         # Connect search
         self.ui.lineEdit.textChanged.connect(self.on_search_changed)
         
@@ -46,6 +84,16 @@ class MainWindow(QMainWindow):
         
         # Load password entries
         self.refresh_list()
+        
+        # Set initial view to vault
+        self.switch_view(0)
+    
+    def switch_view(self, index: int):
+        """Switch between vault and password generator views"""
+        self.stacked_widget.setCurrentIndex(index)
+        # Update button states
+        self.ui.pushButton_7.setChecked(index == 0)
+        self.ui.pushButton_6.setChecked(index == 1)
     
     def on_search_changed(self, text: str):
         """Handle search text change"""
@@ -56,20 +104,27 @@ class MainWindow(QMainWindow):
         """Show sorting options menu"""
         menu = QMenu(self)
         
-        # Create actions
+        # Create action group for radio buttons
+        action_group = QActionGroup(self)
+        action_group.setExclusive(True)
+        
+        # Create actions with radio button behavior
         custom_action = menu.addAction("Custom Order")
         custom_action.setCheckable(True)
         custom_action.setChecked(self.current_sort == "custom")
+        custom_action.setActionGroup(action_group)
         custom_action.triggered.connect(lambda: self.set_sort_type("custom"))
         
         asc_action = menu.addAction("Alphabetical (A-Z)")
         asc_action.setCheckable(True)
         asc_action.setChecked(self.current_sort == "alphabetical_asc")
+        asc_action.setActionGroup(action_group)
         asc_action.triggered.connect(lambda: self.set_sort_type("alphabetical_asc"))
         
         desc_action = menu.addAction("Alphabetical (Z-A)")
         desc_action.setCheckable(True)
         desc_action.setChecked(self.current_sort == "alphabetical_desc")
+        desc_action.setActionGroup(action_group)
         desc_action.triggered.connect(lambda: self.set_sort_type("alphabetical_desc"))
         
         # Show menu at button position
@@ -78,6 +133,8 @@ class MainWindow(QMainWindow):
     def set_sort_type(self, sort_type: str):
         """Set the sorting type and refresh list"""
         self.current_sort = sort_type
+        # Save sort preference
+        self.settings.setValue("sortType", sort_type)
         self.refresh_list()
     
     def refresh_list(self):
@@ -134,19 +191,20 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Error", "Items can only be reordered in Custom Order mode")
             return
         
-        # Get the actual entry index from the model
-        entries = self.model.get_sorted_entries(self.current_sort, self.search_query)
-        if index > 0:
-            # Find actual indices in the full list
-            all_entries = self.model.get_password_entries()
-            actual_index = all_entries.index(entries[index])
-            
-            # Move in model
-            if self.model.move_entry_up(actual_index):
-                # Update selection
-                if self.selected_index == index:
-                    self.selected_index = index - 1
-                self.refresh_list()
+        if index <= 0:
+            return
+        
+        # Get all entries in custom order (no search filter for reordering)
+        all_entries = self.model.get_password_entries()
+        if index >= len(all_entries):
+            return
+        
+        # Move in model
+        if self.model.move_entry_up(index):
+            # Update selection
+            if self.selected_index == index:
+                self.selected_index = index - 1
+            self.refresh_list()
     
     def move_item_down(self, index: int):
         """Move item down in custom order"""
@@ -154,19 +212,17 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Error", "Items can only be reordered in Custom Order mode")
             return
         
-        # Get the actual entry index from the model
-        entries = self.model.get_sorted_entries(self.current_sort, self.search_query)
-        if index < len(entries) - 1:
-            # Find actual indices in the full list
-            all_entries = self.model.get_password_entries()
-            actual_index = all_entries.index(entries[index])
-            
-            # Move in model
-            if self.model.move_entry_down(actual_index):
-                # Update selection
-                if self.selected_index == index:
-                    self.selected_index = index + 1
-                self.refresh_list()
+        # Get all entries in custom order (no search filter for reordering)
+        all_entries = self.model.get_password_entries()
+        if index < 0 or index >= len(all_entries) - 1:
+            return
+        
+        # Move in model
+        if self.model.move_entry_down(index):
+            # Update selection
+            if self.selected_index == index:
+                self.selected_index = index + 1
+            self.refresh_list()
     
     def add_new_item(self):
         """Open the new item window"""
@@ -190,7 +246,7 @@ class MainWindow(QMainWindow):
             reply = QMessageBox.question(
                 self,
                 "Confirm Deletion",
-                f"Are you sure you want to delete '{entry['name']}'?",
+                f"Are you sure you want to delete '{entry['name']}'?\nThis action cannot be reversed.",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
             )
             
@@ -214,7 +270,7 @@ class MainWindow(QMainWindow):
         reply = QMessageBox.question(
             self,
             "Confirm Deletion",
-            f"Are you sure you want to delete ALL {len(entries)} password(s)?",
+            f"Are you sure you want to delete ALL {len(entries)} password(s)?\nThis action cannot be reversed.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         
@@ -234,5 +290,14 @@ class MainWindow(QMainWindow):
         )
         
         if reply == QMessageBox.StandardButton.Yes:
+            # Clear saved email and remember me preference
+            settings = QSettings("PasswordVault", "LoginPreferences")
+            settings.setValue("rememberEmail", False)
+            settings.remove("savedEmail")
+            
+            # Logout from model
             self.model.logout()
+            
+            # Emit signal to show login window
+            self.logout_requested.emit()
             self.close()

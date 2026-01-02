@@ -5,6 +5,13 @@ A secure password manager with user authentication
 """
 
 import sys
+import os
+
+# Disable Qt accessibility to suppress warnings
+os.environ['QT_ACCESSIBILITY'] = '0'
+os.environ['QT_LINUX_ACCESSIBILITY_ALWAYS_ON'] = '0'
+os.environ['NO_AT_BRIDGE'] = '1'
+
 from PySide6.QtWidgets import QApplication
 from model.Model import PasswordVaultModel
 from ViewModel.LoginWindow import LoginWindow
@@ -32,19 +39,25 @@ def main():
         try:
             main_window = MainWindow(model)
             print("MainWindow created")  # Debug
+            
+            # Connect logout signal
+            main_window.logout_requested.connect(on_logout)
+            
             main_window.show()
             print("MainWindow shown")  # Debug
-            
-            # When main window is closed, show login again
-            def on_main_window_closed():
-                login_window.ui.lineEdit_2.clear()  # Clear password field
-                login_window.show()
-            
-            main_window.destroyed.connect(on_main_window_closed)
         except Exception as e:
             print(f"Error creating MainWindow: {e}")  # Debug
             import traceback
             traceback.print_exc()
+    
+    def on_logout():
+        """Handle logout - return to login screen"""
+        # Clear and reset login window
+        login_window.ui.lineEdit.clear()
+        login_window.ui.lineEdit_2.clear()
+        login_window.ui.checkBox.setChecked(False)
+        login_window.ui.checkBox.setEnabled(False)
+        login_window.show()
     
     login_window.login_successful.connect(on_login_success)
     

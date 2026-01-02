@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QDialog, QMessageBox
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QSettings
 from View.LoginWindow_ui import Ui_Dialog
 
 
@@ -13,6 +13,7 @@ class LoginWindow(QDialog):
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.model = model
+        self.settings = QSettings("PasswordVault", "LoginPreferences")
         
         # Connect buttons
         self.ui.pushButton.clicked.connect(self.handle_login)
@@ -24,6 +25,26 @@ class LoginWindow(QDialog):
         # Press Enter to login
         self.ui.lineEdit.returnPressed.connect(self.handle_login)
         self.ui.lineEdit_2.returnPressed.connect(self.handle_login)
+        
+        # Enable checkbox when user types email
+        self.ui.lineEdit.textChanged.connect(self.check_email_entered)
+        
+        # Load saved email if remember me was checked
+        self.load_saved_email()
+    
+    def check_email_entered(self, text):
+        """Enable checkbox when email is entered"""
+        self.ui.checkBox.setEnabled(len(text.strip()) > 0)
+    
+    def load_saved_email(self):
+        """Load saved email if remember me was enabled"""
+        remember = self.settings.value("rememberEmail", False, type=bool)
+        if remember:
+            saved_email = self.settings.value("savedEmail", "", type=str)
+            if saved_email:
+                self.ui.lineEdit.setText(saved_email)
+                self.ui.checkBox.setChecked(True)
+                self.ui.checkBox.setEnabled(True)
     
     def handle_login(self):
         """Handle login button click"""
@@ -37,6 +58,14 @@ class LoginWindow(QDialog):
         success, message = self.model.login_user(email, password)
         
         if success:
+            # Save email if remember me is checked
+            if self.ui.checkBox.isChecked():
+                self.settings.setValue("rememberEmail", True)
+                self.settings.setValue("savedEmail", email)
+            else:
+                self.settings.setValue("rememberEmail", False)
+                self.settings.remove("savedEmail")
+            
             self.login_successful.emit(email)
             self.accept()  # Close dialog with success
         else:

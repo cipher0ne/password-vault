@@ -16,6 +16,13 @@
                     "password": "haslo",
                     "url": "teams.com",
                     "custom_order": 0
+                },
+                {
+                    "name": "lol",
+                    "username": "ghuab",
+                    "password": "dfjgbag",
+                    "url": "jdgapo.com",
+                    "custom_order": 2
                 }
             ]
         }

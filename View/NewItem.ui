@@ -84,9 +84,21 @@
               <height>31</height>
              </rect>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>231</width>
+              <height>31</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>231</width>
+              <height>31</height>
+             </size>
+            </property>
             <property name="font">
              <font>
-              <pointsize>16</pointsize>
+              <pointsize>12</pointsize>
              </font>
             </property>
             <property name="text">
@@ -127,9 +139,21 @@
               <height>31</height>
              </rect>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>231</width>
+              <height>31</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>231</width>
+              <height>31</height>
+             </size>
+            </property>
             <property name="font">
              <font>
-              <pointsize>16</pointsize>
+              <pointsize>12</pointsize>
              </font>
             </property>
             <property name="text">
@@ -170,9 +194,21 @@
               <height>31</height>
              </rect>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>231</width>
+              <height>31</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>231</width>
+              <height>31</height>
+             </size>
+            </property>
             <property name="font">
              <font>
-              <pointsize>16</pointsize>
+              <pointsize>12</pointsize>
              </font>
             </property>
             <property name="text">
@@ -213,9 +249,21 @@
               <height>31</height>
              </rect>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>231</width>
+              <height>31</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>231</width>
+              <height>31</height>
+             </size>
+            </property>
             <property name="font">
              <font>
-              <pointsize>16</pointsize>
+              <pointsize>12</pointsize>
              </font>
             </property>
             <property name="text">
