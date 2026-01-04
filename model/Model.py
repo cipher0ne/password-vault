@@ -1,6 +1,9 @@
 import hashlib
 import sqlite3
 import base64
+import os
+import sys
+from pathlib import Path
 from typing import Optional, List, Dict
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -10,8 +13,31 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 class PasswordVaultModel:
     """Data model for managing users and their password entries using encrypted SQLite"""
     
-    def __init__(self, db_file: str = "vault_data.db", master_key: str = "default_secure_key_change_in_production"):
-        self.db_file = db_file
+    @staticmethod
+    def _get_data_directory():
+        """Get the appropriate data directory for the current OS"""
+        if sys.platform == "win32":
+            # Windows: %APPDATA%/PasswordVault
+            appdata = os.getenv('APPDATA')
+            data_dir = Path(appdata) / "PasswordVault"
+        elif sys.platform == "darwin":
+            # macOS: ~/Library/Application Support/PasswordVault
+            data_dir = Path.home() / "Library" / "Application Support" / "PasswordVault"
+        else:
+            # Linux: ~/.local/share/PasswordVault
+            data_dir = Path.home() / ".local" / "share" / "PasswordVault"
+        
+        # Create directory if it doesn't exist
+        data_dir.mkdir(parents=True, exist_ok=True)
+        return data_dir
+    
+    def __init__(self, db_file: Optional[str] = None, master_key: str = "default_secure_key_change_in_production"):
+        # Use default location if no db_file specified
+        if db_file is None:
+            data_dir = self._get_data_directory()
+            self.db_file = str(data_dir / "vault_data.db")
+        else:
+            self.db_file = db_file
         self.master_key = master_key
         self.current_user: Optional[str] = None
         self._cipher = self._create_cipher(master_key)
