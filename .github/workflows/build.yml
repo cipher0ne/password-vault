@@ -113,13 +113,18 @@ jobs:
         with:
           path: artifacts
       
+      - name: Rename artifacts with platform names
+        run: |
+          mv artifacts/PasswordVault-linux/PasswordVault artifacts/PasswordVault-linux/PasswordVault-linux
+          mv artifacts/PasswordVault-macos/PasswordVault artifacts/PasswordVault-macos/PasswordVault-macos
+      
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/PasswordVault-linux/PasswordVault
+            artifacts/PasswordVault-linux/PasswordVault-linux
             artifacts/PasswordVault-windows/PasswordVault.exe
-            artifacts/PasswordVault-macos/PasswordVault
+            artifacts/PasswordVault-macos/PasswordVault-macos
           draft: false
           prerelease: false
         env:
