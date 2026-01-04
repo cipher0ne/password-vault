@@ -122,6 +122,9 @@ class Ui_Dialog(object):
         self.lineEdit_2.setPlaceholderText(QCoreApplication.translate("Dialog", u"Password", None))
         self.label_3.setText(QCoreApplication.translate("Dialog", u"<html><head/><body><p>Reset password</p></body></html>", None))
         self.pushButton.setText(QCoreApplication.translate("Dialog", u"Log in", None))
+#if QT_CONFIG(tooltip)
+        self.pushButton_2.setToolTip(QCoreApplication.translate("Dialog", u"<html><head/><body><p>If you dont have an account yet</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.pushButton_2.setText(QCoreApplication.translate("Dialog", u"Sign up", None))
     # retranslateUi
 

@@ -1,31 +1,83 @@
-import json
-import os
 import hashlib
+import sqlite3
+import base64
 from typing import Optional, List, Dict
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 
 class PasswordVaultModel:
-    """Data model for managing users and their password entries"""
+    """Data model for managing users and their password entries using encrypted SQLite"""
     
-    def __init__(self, data_file: str = "vault_data.json"):
-        self.data_file = data_file
+    def __init__(self, db_file: str = "vault_data.db", master_key: str = "default_secure_key_change_in_production"):
+        self.db_file = db_file
+        self.master_key = master_key
         self.current_user: Optional[str] = None
-        self.data = self._load_data()
+        self._cipher = self._create_cipher(master_key)
+        self._init_database()
     
-    def _load_data(self) -> dict:
-        """Load data from JSON file"""
-        if os.path.exists(self.data_file):
-            try:
-                with open(self.data_file, 'r') as f:
-                    return json.load(f)
-            except json.JSONDecodeError:
-                return {"users": {}}
-        return {"users": {}}
+    def _create_cipher(self, password: str):
+        """Create Fernet cipher from password"""
+        # Derive a key from the password
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=b'password_vault_salt',  # In production, use a random salt stored separately
+            iterations=100000,
+        )
+        key = base64.urlsafe_b64encode(kdf.derive(password.encode()))
+        return Fernet(key)
     
-    def _save_data(self):
-        """Save data to JSON file"""
-        with open(self.data_file, 'w') as f:
-            json.dump(self.data, f, indent=4)
+    def _encrypt(self, data: str) -> str:
+        """Encrypt string data"""
+        return self._cipher.encrypt(data.encode()).decode()
+    
+    def _decrypt(self, encrypted_data: str) -> str:
+        """Decrypt string data"""
+        return self._cipher.decrypt(encrypted_data.encode()).decode()
+    
+    def _get_connection(self):
+        """Get database connection"""
+        conn = sqlite3.connect(self.db_file)
+        conn.row_factory = sqlite3.Row
+        return conn
+    
+    def _init_database(self):
+        """Initialize database schema"""
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        # Create users table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                email TEXT PRIMARY KEY,
+                password_hash TEXT NOT NULL
+            )
+        """)
+        
+        # Create passwords table (password field will be encrypted)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS passwords (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_email TEXT NOT NULL,
+                name TEXT NOT NULL,
+                username TEXT NOT NULL,
+                password TEXT NOT NULL,
+                url TEXT,
+                custom_order INTEGER NOT NULL DEFAULT 0,
+                FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE
+            )
+        """)
+        
+        # Create index for faster queries
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_passwords_user 
+            ON passwords(user_email)
+        """)
+        
+        conn.commit()
+        conn.close()
     
     def _hash_password(self, password: str) -> str:
         """Hash password using SHA-256"""
@@ -33,23 +85,43 @@ class PasswordVaultModel:
     
     def register_user(self, email: str, password: str) -> tuple[bool, str]:
         """Register a new user"""
-        if email in self.data["users"]:
-            return False, "User already exists"
+        conn = self._get_connection()
+        cursor = conn.cursor()
         
-        self.data["users"][email] = {
-            "password_hash": self._hash_password(password),
-            "passwords": []
-        }
-        self._save_data()
-        return True, "Registration successful"
+        try:
+            # Check if user exists
+            cursor.execute("SELECT email FROM users WHERE email = ?", (email,))
+            if cursor.fetchone():
+                conn.close()
+                return False, "User already exists"
+            
+            # Insert new user
+            password_hash = self._hash_password(password)
+            cursor.execute(
+                "INSERT INTO users (email, password_hash) VALUES (?, ?)",
+                (email, password_hash)
+            )
+            conn.commit()
+            conn.close()
+            return True, "Registration successful"
+        except Exception as e:
+            conn.close()
+            return False, f"Registration failed: {str(e)}"
     
     def login_user(self, email: str, password: str) -> tuple[bool, str]:
         """Authenticate user"""
-        if email not in self.data["users"]:
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT password_hash FROM users WHERE email = ?", (email,))
+        result = cursor.fetchone()
+        conn.close()
+        
+        if not result:
             return False, "User not found"
         
         password_hash = self._hash_password(password)
-        if self.data["users"][email]["password_hash"] == password_hash:
+        if result['password_hash'] == password_hash:
             self.current_user = email
             return True, "Login successful"
         return False, "Incorrect password"
@@ -63,37 +135,98 @@ class PasswordVaultModel:
         if not self.current_user:
             return False
         
-        # Get the next order value
-        passwords = self.data["users"][self.current_user]["passwords"]
-        next_order = len(passwords)
+        conn = self._get_connection()
+        cursor = conn.cursor()
         
-        entry = {
-            "name": name,
-            "username": username,
-            "password": password,
-            "url": url,
-            "custom_order": next_order
-        }
-        self.data["users"][self.current_user]["passwords"].append(entry)
-        self._save_data()
-        return True
+        try:
+            # Get the next order value
+            cursor.execute(
+                "SELECT COALESCE(MAX(custom_order), -1) + 1 FROM passwords WHERE user_email = ?",
+                (self.current_user,)
+            )
+            next_order = cursor.fetchone()[0]
+            
+            # Encrypt the password before storing
+            encrypted_password = self._encrypt(password)
+            
+            # Insert new password entry
+            cursor.execute(
+                """INSERT INTO passwords (user_email, name, username, password, url, custom_order)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                (self.current_user, name, username, encrypted_password, url, next_order)
+            )
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            conn.close()
+            print(f"Error adding password entry: {e}")
+            return False
     
     def get_password_entries(self) -> List[Dict]:
         """Get all password entries for current user"""
         if not self.current_user:
             return []
-        return self.data["users"][self.current_user]["passwords"]
+        
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute(
+            """SELECT name, username, password, url, custom_order 
+               FROM passwords WHERE user_email = ? ORDER BY custom_order""",
+            (self.current_user,)
+        )
+        
+        entries = []
+        for row in cursor.fetchall():
+            # Decrypt password before returning
+            try:
+                decrypted_password = self._decrypt(row['password'])
+            except:
+                decrypted_password = ""  # Handle decryption errors gracefully
+            
+            entries.append({
+                'name': row['name'],
+                'username': row['username'],
+                'password': decrypted_password,
+                'url': row['url'],
+                'custom_order': row['custom_order']
+            })
+        
+        conn.close()
+        return entries
     
     def delete_password_entry(self, index: int) -> bool:
         """Delete a password entry by index"""
         if not self.current_user:
             return False
         
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
         try:
-            self.data["users"][self.current_user]["passwords"].pop(index)
-            self._save_data()
+            # Get all entries to find the one at the given index
+            cursor.execute(
+                """SELECT id FROM passwords WHERE user_email = ? 
+                   ORDER BY custom_order LIMIT 1 OFFSET ?""",
+                (self.current_user, index)
+            )
+            result = cursor.fetchone()
+            
+            if not result:
+                conn.close()
+                return False
+            
+            entry_id = result['id']
+            
+            # Delete the entry
+            cursor.execute("DELETE FROM passwords WHERE id = ?", (entry_id,))
+            conn.commit()
+            conn.close()
             return True
-        except IndexError:
+        except Exception as e:
+            conn.close()
+            print(f"Error deleting password entry: {e}")
             return False
     
     def delete_all_entries(self) -> bool:
@@ -101,65 +234,175 @@ class PasswordVaultModel:
         if not self.current_user:
             return False
         
-        self.data["users"][self.current_user]["passwords"] = []
-        self._save_data()
-        return True
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("DELETE FROM passwords WHERE user_email = ?", (self.current_user,))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            conn.close()
+            print(f"Error deleting all entries: {e}")
+            return False
+    
+    def update_password_entry(self, index: int, name: str, username: str, password: str, url: str = "") -> bool:
+        """Update a password entry by index"""
+        if not self.current_user:
+            return False
+        
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Get the entry id at the given index
+            cursor.execute(
+                """SELECT id FROM passwords WHERE user_email = ? 
+                   ORDER BY custom_order LIMIT 1 OFFSET ?""",
+                (self.current_user, index)
+            )
+            result = cursor.fetchone()
+            
+            if not result:
+                conn.close()
+                return False
+            
+            entry_id = result['id']
+            
+            # Encrypt the password before storing
+            encrypted_password = self._encrypt(password)
+            
+            # Update the entry
+            cursor.execute(
+                """UPDATE passwords 
+                   SET name = ?, username = ?, password = ?, url = ?
+                   WHERE id = ?""",
+                (name, username, encrypted_password, url, entry_id)
+            )
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            conn.close()
+            print(f"Error updating password entry: {e}")
+            return False
     
     def move_entry_up(self, index: int) -> bool:
         """Move an entry up in custom order"""
         if not self.current_user or index <= 0:
             return False
         
-        passwords = self.data["users"][self.current_user]["passwords"]
-        if index >= len(passwords):
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Get the two entries to swap
+            cursor.execute(
+                """SELECT id, custom_order FROM passwords WHERE user_email = ? 
+                   ORDER BY custom_order LIMIT 2 OFFSET ?""",
+                (self.current_user, index - 1)
+            )
+            results = cursor.fetchall()
+            
+            if len(results) < 2:
+                conn.close()
+                return False
+            
+            id1, order1 = results[0]['id'], results[0]['custom_order']
+            id2, order2 = results[1]['id'], results[1]['custom_order']
+            
+            # Swap custom_order values
+            cursor.execute("UPDATE passwords SET custom_order = ? WHERE id = ?", (order2, id1))
+            cursor.execute("UPDATE passwords SET custom_order = ? WHERE id = ?", (order1, id2))
+            
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            conn.close()
+            print(f"Error moving entry up: {e}")
             return False
-        
-        # Swap custom_order values
-        passwords[index]["custom_order"], passwords[index - 1]["custom_order"] = \
-            passwords[index - 1]["custom_order"], passwords[index]["custom_order"]
-        
-        self._save_data()
-        return True
     
     def move_entry_down(self, index: int) -> bool:
         """Move an entry down in custom order"""
         if not self.current_user:
             return False
         
-        passwords = self.data["users"][self.current_user]["passwords"]
-        if index < 0 or index >= len(passwords) - 1:
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Get the two entries to swap
+            cursor.execute(
+                """SELECT id, custom_order FROM passwords WHERE user_email = ? 
+                   ORDER BY custom_order LIMIT 2 OFFSET ?""",
+                (self.current_user, index)
+            )
+            results = cursor.fetchall()
+            
+            if len(results) < 2:
+                conn.close()
+                return False
+            
+            id1, order1 = results[0]['id'], results[0]['custom_order']
+            id2, order2 = results[1]['id'], results[1]['custom_order']
+            
+            # Swap custom_order values
+            cursor.execute("UPDATE passwords SET custom_order = ? WHERE id = ?", (order2, id1))
+            cursor.execute("UPDATE passwords SET custom_order = ? WHERE id = ?", (order1, id2))
+            
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            conn.close()
+            print(f"Error moving entry down: {e}")
             return False
-        
-        # Swap custom_order values
-        passwords[index]["custom_order"], passwords[index + 1]["custom_order"] = \
-            passwords[index + 1]["custom_order"], passwords[index]["custom_order"]
-        
-        self._save_data()
-        return True
     
     def get_sorted_entries(self, sort_type: str = "custom", search_query: str = "") -> List[Dict]:
         """Get password entries sorted by specified type and optionally filtered by search"""
         if not self.current_user:
             return []
         
-        entries = self.data["users"][self.current_user]["passwords"].copy()
+        conn = self._get_connection()
+        cursor = conn.cursor()
         
-        # Add custom_order to old entries that don't have it
-        for i, entry in enumerate(entries):
-            if "custom_order" not in entry:
-                entry["custom_order"] = i
-        
-        # Apply search filter
+        # Build query based on search
         if search_query:
-            search_lower = search_query.lower()
-            entries = [
-                entry for entry in entries
-                if search_lower in entry["name"].lower() or 
-                   search_lower in entry["username"].lower() or
-                   search_lower in entry.get("url", "").lower()
-            ]
+            search_pattern = f"%{search_query}%"
+            cursor.execute(
+                """SELECT name, username, password, url, custom_order 
+                   FROM passwords WHERE user_email = ? 
+                   AND (name LIKE ? OR username LIKE ? OR url LIKE ?)""",
+                (self.current_user, search_pattern, search_pattern, search_pattern)
+            )
+        else:
+            cursor.execute(
+                """SELECT name, username, password, url, custom_order 
+                   FROM passwords WHERE user_email = ?""",
+                (self.current_user,)
+            )
         
-        # Apply sorting
+        entries = []
+        for row in cursor.fetchall():
+            # Decrypt password before returning
+            try:
+                decrypted_password = self._decrypt(row['password'])
+            except:
+                decrypted_password = ""  # Handle decryption errors gracefully
+            
+            entries.append({
+                'name': row['name'],
+                'username': row['username'],
+                'password': decrypted_password,
+                'url': row['url'],
+                'custom_order': row['custom_order']
+            })
+        
+        conn.close()
+        
+        # Apply sorting in Python (could be moved to SQL for better performance)
         if sort_type == "alphabetical_asc":
             entries.sort(key=lambda x: x["name"].lower())
         elif sort_type == "alphabetical_desc":

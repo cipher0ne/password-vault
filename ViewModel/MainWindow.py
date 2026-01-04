@@ -4,6 +4,7 @@ from PySide6.QtGui import QActionGroup
 from View.MainWindow_ui import Ui_MainWindow
 from ViewModel.PasswordItemWidget import PasswordItemWidget
 from ViewModel.PasswordGeneratorWidget import PasswordGeneratorWidget
+from ViewModel.AboutDialog import AboutDialog
 
 
 class MainWindow(QMainWindow):
@@ -80,6 +81,7 @@ class MainWindow(QMainWindow):
         self.ui.lineEdit.textChanged.connect(self.on_search_changed)
         
         # Connect menu actions
+        self.ui.actionAbout.triggered.connect(self.show_about_dialog)
         self.ui.actionRemove_all_passwords.triggered.connect(self.remove_all_passwords)
         
         # Load password entries
@@ -87,6 +89,9 @@ class MainWindow(QMainWindow):
         
         # Set initial view to vault
         self.switch_view(0)
+        
+        # Center the window on screen
+        self.center_window()
     
     def switch_view(self, index: int):
         """Switch between vault and password generator views"""
@@ -164,13 +169,16 @@ class MainWindow(QMainWindow):
             widget.move_up_clicked.connect(self.move_item_up)
             widget.move_down_clicked.connect(self.move_item_down)
             widget.item_clicked.connect(self.on_item_clicked)
+            widget.edit_clicked.connect(self.edit_item)
             
-            # Enable/disable buttons based on position (only for custom sort)
+            # Show/hide up/down buttons based on sort mode
             if self.current_sort == "custom":
+                widget.set_buttons_visible(True)
+                # Enable/disable buttons based on position
                 widget.set_buttons_enabled(i > 0, i < len(entries) - 1)
             else:
-                # Disable up/down buttons when not in custom sort mode
-                widget.set_buttons_enabled(False, False)
+                # Hide up/down buttons when not in custom sort mode
+                widget.set_buttons_visible(False)
             
             # Add to list
             self.list_widget.addItem(item)
@@ -230,6 +238,47 @@ class MainWindow(QMainWindow):
         new_item_window = NewItemWindow(self.model, self)
         if new_item_window.exec():
             # Refresh the list after adding
+            self.refresh_list()
+    
+    def edit_item(self, index: int):
+        """Edit an existing password entry"""
+        from ViewModel.NewItem import NewItemWindow
+        
+        # Get the current sorted/filtered entries
+        entries = self.model.get_sorted_entries(self.current_sort, self.search_query)
+        
+        if index < 0 or index >= len(entries):
+            QMessageBox.warning(self, "Error", "Invalid item index")
+            return
+        
+        # Get the entry data
+        entry_data = entries[index]
+        
+        # Find the actual index in the unfiltered list (for updating)
+        all_entries = self.model.get_sorted_entries("custom", "")
+        actual_index = None
+        for i, e in enumerate(all_entries):
+            if (e['name'] == entry_data['name'] and 
+                e['username'] == entry_data['username'] and
+                e['custom_order'] == entry_data['custom_order']):
+                actual_index = i
+                break
+        
+        if actual_index is None:
+            QMessageBox.warning(self, "Error", "Could not find entry to edit")
+            return
+        
+        # Open dialog in edit mode
+        edit_window = NewItemWindow(
+            self.model, 
+            self, 
+            edit_mode=True, 
+            edit_index=actual_index, 
+            entry_data=entry_data
+        )
+        
+        if edit_window.exec():
+            # Refresh the list after editing
             self.refresh_list()
     
     def remove_selected_item(self):
@@ -301,3 +350,16 @@ class MainWindow(QMainWindow):
             # Emit signal to show login window
             self.logout_requested.emit()
             self.close()
+    
+    def center_window(self):
+        """Center the window on the screen"""
+        screen = self.screen().availableGeometry()
+        window_geometry = self.frameGeometry()
+        center_point = screen.center()
+        window_geometry.moveCenter(center_point)
+        self.move(window_geometry.topLeft())
+    
+    def show_about_dialog(self):
+        """Show the About dialog"""
+        dialog = AboutDialog(self)
+        dialog.exec()

@@ -1,0 +1,11 @@
+from PySide6.QtWidgets import QDialog
+from View.About_ui import Ui_Dialog
+
+
+class AboutDialog(QDialog):
+    """About dialog window"""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_Dialog()
+        self.ui.setupUi(self)

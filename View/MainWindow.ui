@@ -276,20 +276,20 @@
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuAbout">
-    <property name="title">
-     <string>About</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuRemove_all_saved_passwords">
     <property name="title">
      <string>Misc.</string>
     </property>
     <addaction name="actionRemove_all_passwords"/>
    </widget>
-   <addaction name="menuAbout"/>
+   <addaction name="actionAbout"/>
    <addaction name="menuRemove_all_saved_passwords"/>
   </widget>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
   <action name="actionRemove_all_passwords">
    <property name="text">
     <string>Remove all passwords</string>

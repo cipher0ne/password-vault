@@ -17,10 +17,26 @@ class PasswordGeneratorWidget(QWidget):
         # Set theme-aware icons
         self._set_theme_icons()
         
+        # Initialize password length
+        self.password_length = 12  # Default length
+        self.ui.label_2.setText(str(self.password_length))
+        
         # Connect copy button
         self.ui.toolButton.clicked.connect(self.copy_password)
         # Connect regenerate button
         self.ui.toolButton_2.clicked.connect(self.generate_password)
+        # Connect length adjustment buttons
+        self.ui.toolButton_3.clicked.connect(self.decrease_length)  # Minus button
+        self.ui.toolButton_4.clicked.connect(self.increase_length)  # Plus button
+        
+        # Connect checkboxes to regenerate password
+        self.ui.checkBox.toggled.connect(self.generate_password)    # A-Z
+        self.ui.checkBox_2.toggled.connect(self.generate_password)  # a-z
+        self.ui.checkBox_3.toggled.connect(self.generate_password)  # 0-9
+        self.ui.checkBox_4.toggled.connect(self.generate_password)  # Special chars
+        
+        # Generate initial password
+        self.generate_password()
     
     def _recolor_svg_icon(self, svg_path: str, color: QColor, size: int = 16) -> QIcon:
         """Recolor an SVG icon to match the theme"""
@@ -58,19 +74,17 @@ class PasswordGeneratorWidget(QWidget):
         # Get the text color from palette to use for icons
         text_color = self.palette().text().color()
         
-        # Recolor the custom SVG icons using actual file paths
+        # Recolor the custom SVG icon using actual file path
         self.copy_icon = self._recolor_svg_icon("icons/copy.svg", text_color)
         
-        # Apply the recolored icons to all copy buttons
+        # Apply the recolored icon to the copy button
         if not self.copy_icon.isNull():
             self.ui.toolButton.setIcon(self.copy_icon)
-            self.ui.toolButton_5.setIcon(self.copy_icon)
-            self.ui.toolButton_6.setIcon(self.copy_icon)
-            self.ui.toolButton_7.setIcon(self.copy_icon)
     
     def copy_password(self):
         """Copy generated password to clipboard"""
-        password = self.ui.label.text()
+        # Get the password without line breaks
+        password = self.ui.label.text().replace('\n', '')
         if password:
             clipboard = QApplication.clipboard()
             clipboard.setText(password)
@@ -90,11 +104,75 @@ class PasswordGeneratorWidget(QWidget):
     
     def generate_password(self):
         """Generate a new password based on selected options"""
-        # TODO: Implement password generation logic
         import random
         import string
         
-        length = 16  # Default length
-        chars = string.ascii_letters + string.digits + string.punctuation
-        password = ''.join(random.choice(chars) for _ in range(length))
-        self.ui.label.setText(password)
+        # Build character sets for each category
+        categories = []
+        all_chars = ""
+        
+        if self.ui.checkBox.isChecked():  # A-Z
+            uppercase = string.ascii_uppercase
+            categories.append(uppercase)
+            all_chars += uppercase
+        
+        if self.ui.checkBox_2.isChecked():  # a-z
+            lowercase = string.ascii_lowercase
+            categories.append(lowercase)
+            all_chars += lowercase
+        
+        if self.ui.checkBox_3.isChecked():  # 0-9
+            digits = string.digits
+            categories.append(digits)
+            all_chars += digits
+        
+        if self.ui.checkBox_4.isChecked():  # Special characters
+            special = "!@#$%^&*"  # Only the specific characters shown in label
+            categories.append(special)
+            all_chars += special
+        
+        # If no character types selected, use all
+        if not categories:
+            uppercase = string.ascii_uppercase
+            lowercase = string.ascii_lowercase
+            digits = string.digits
+            special = "!@#$%^&*"
+            categories = [uppercase, lowercase, digits, special]
+            all_chars = uppercase + lowercase + digits + special
+        
+        # Ensure password is long enough for at least one char from each category
+        length = max(self.password_length, len(categories))
+        
+        # Start with one character from each selected category
+        password_chars = []
+        for category in categories:
+            password_chars.append(random.choice(category))
+        
+        # Fill remaining length with random characters from all categories
+        remaining_length = length - len(categories)
+        for _ in range(remaining_length):
+            password_chars.append(random.choice(all_chars))
+        
+        # Shuffle to avoid predictable pattern
+        random.shuffle(password_chars)
+        
+        password = ''.join(password_chars)
+        
+        # Insert line breaks every 20 characters
+        formatted_password = '\n'.join(password[i:i+20] for i in range(0, len(password), 20))
+        
+        self.ui.label.setText(formatted_password)
+    
+    def increase_length(self):
+        """Increase password length"""
+        if self.password_length < 64:  # Max length
+            self.password_length += 1
+            self.ui.label_2.setText(str(self.password_length))
+            self.generate_password()
+    
+    def decrease_length(self):
+        """Decrease password length"""
+        if self.password_length > 4:  # Min length
+            self.password_length -= 1
+            self.ui.label_2.setText(str(self.password_length))
+            self.generate_password()

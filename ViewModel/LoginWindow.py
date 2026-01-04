@@ -76,6 +76,11 @@ class LoginWindow(QDialog):
         """Open the sign up window"""
         from ViewModel.SignUpWindow import SignUpWindow
         signup_window = SignUpWindow(self.model, self)
+        # Connect signup success to login success
+        signup_window.login_successful.connect(self.login_successful.emit)
+        self.hide()  # Hide login window while signup is open
         if signup_window.exec() == QDialog.DialogCode.Accepted:
-            # User successfully signed up, optionally pre-fill email
-            pass
+            # User successfully signed up and logged in
+            self.accept()  # Close login window
+        else:
+            self.show()  # Show login window again if signup was cancelled

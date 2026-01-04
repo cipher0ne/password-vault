@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""
-Password Vault Application
-A secure password manager with user authentication
-"""
-
 import sys
 import os
 
@@ -35,18 +30,18 @@ def main():
     def on_login_success(email):
         """Handle successful login"""
         nonlocal main_window
-        print(f"Login successful for: {email}")  # Debug
+        print(f"Login successful for: {email}")
         try:
             main_window = MainWindow(model)
-            print("MainWindow created")  # Debug
+            print("MainWindow created")
             
             # Connect logout signal
             main_window.logout_requested.connect(on_logout)
             
             main_window.show()
-            print("MainWindow shown")  # Debug
+            print("MainWindow shown")
         except Exception as e:
-            print(f"Error creating MainWindow: {e}")  # Debug
+            print(f"Error creating MainWindow: {e}")
             import traceback
             traceback.print_exc()
     

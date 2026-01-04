@@ -1,5 +1,39 @@
-.venv/
-vault_data.db
-build/
+# Python bytecode
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build artifacts
+build/
 dist/
+
+# Database files (user data)
+vault_data.db
+*.db
+
+# IDE and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Qt resource cache
+*.qmlc
+*.jsc
+
+# Test files (optional - uncomment if you want to exclude tests)
+# test_*.py

@@ -1,10 +1,13 @@
 from PySide6.QtWidgets import QDialog, QMessageBox
+from PySide6.QtCore import Signal
 from View.SignUpWindow_ui import Ui_Dialog
 import re
 
 
 class SignUpWindow(QDialog):
     """Sign up window ViewModel"""
+    
+    login_successful = Signal(str)  # Signal emitted with user email on successful registration
     
     def __init__(self, model, parent=None):
         super().__init__(parent)
@@ -77,7 +80,9 @@ class SignUpWindow(QDialog):
         success, message = self.model.register_user(email, password)
         
         if success:
-            QMessageBox.information(self, "Success", "Registration successful! You can now log in.")
+            # Automatically log in the user after registration
+            self.model.login_user(email, password)
+            self.login_successful.emit(email)
             self.accept()  # Close dialog with success
         else:
             QMessageBox.warning(self, "Registration Failed", message)

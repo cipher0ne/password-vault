@@ -12,6 +12,7 @@ class PasswordItemWidget(QWidget):
     move_up_clicked = Signal(int)  # Emits the index
     move_down_clicked = Signal(int)
     item_clicked = Signal(int)
+    edit_clicked = Signal(int)  # Emits the index for editing
     
     def __init__(self, index: int, name: str, username: str, password: str = "", url: str = "", parent=None):
         super().__init__(parent)
@@ -48,6 +49,7 @@ class PasswordItemWidget(QWidget):
         self.ui.toolButton_2.clicked.connect(self.copy_password)
         self.ui.toolButton_3.clicked.connect(self.copy_url)
         self.ui.toolButton_4.clicked.connect(self.toggle_password_visibility)
+        self.ui.toolButton_5.clicked.connect(lambda: self.edit_clicked.emit(self.index))
         
         # Make the whole widget clickable
         self.mousePressEvent = lambda event: self.item_clicked.emit(self.index)
@@ -93,6 +95,7 @@ class PasswordItemWidget(QWidget):
         self.copy_icon = self._recolor_svg_icon("icons/copy.svg", text_color)
         self.show_icon = self._recolor_svg_icon("icons/show.svg", text_color)
         self.hide_icon = self._recolor_svg_icon("icons/hide.svg", text_color)
+        self.edit_icon = self._recolor_svg_icon("icons/edit.svg", text_color)
         
         # Apply the recolored icons
         if not self.copy_icon.isNull():
@@ -102,6 +105,9 @@ class PasswordItemWidget(QWidget):
         
         if not self.show_icon.isNull():
             self.ui.toolButton_4.setIcon(self.show_icon)
+        
+        if not self.edit_icon.isNull():
+            self.ui.toolButton_5.setIcon(self.edit_icon)
     
     def _show_copied_tooltip(self, button):
         """Temporarily show 'Copied!' tooltip"""
@@ -152,6 +158,11 @@ class PasswordItemWidget(QWidget):
         """Enable/disable up and down buttons"""
         self.ui.upButton.setEnabled(up_enabled)
         self.ui.downButton.setEnabled(down_enabled)
+    
+    def set_buttons_visible(self, visible: bool):
+        """Show/hide up and down buttons"""
+        self.ui.upButton.setVisible(visible)
+        self.ui.downButton.setVisible(visible)
     
     def update_index(self, new_index: int):
         """Update the stored index"""

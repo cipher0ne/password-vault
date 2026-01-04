@@ -28,6 +28,8 @@ class Ui_MainWindow(object):
         MainWindow.setEnabled(True)
         MainWindow.resize(362, 534)
         MainWindow.setMinimumSize(QSize(362, 534))
+        self.actionAbout = QAction(MainWindow)
+        self.actionAbout.setObjectName(u"actionAbout")
         self.actionRemove_all_passwords = QAction(MainWindow)
         self.actionRemove_all_passwords.setObjectName(u"actionRemove_all_passwords")
         self.centralwidget = QWidget(MainWindow)
@@ -173,13 +175,11 @@ class Ui_MainWindow(object):
         self.menuBar = QMenuBar(MainWindow)
         self.menuBar.setObjectName(u"menuBar")
         self.menuBar.setGeometry(QRect(0, 0, 362, 20))
-        self.menuAbout = QMenu(self.menuBar)
-        self.menuAbout.setObjectName(u"menuAbout")
         self.menuRemove_all_saved_passwords = QMenu(self.menuBar)
         self.menuRemove_all_saved_passwords.setObjectName(u"menuRemove_all_saved_passwords")
         MainWindow.setMenuBar(self.menuBar)
 
-        self.menuBar.addAction(self.menuAbout.menuAction())
+        self.menuBar.addAction(self.actionAbout)
         self.menuBar.addAction(self.menuRemove_all_saved_passwords.menuAction())
         self.menuRemove_all_saved_passwords.addAction(self.actionRemove_all_passwords)
 
@@ -190,6 +190,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Password Vault", None))
+        self.actionAbout.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.actionRemove_all_passwords.setText(QCoreApplication.translate("MainWindow", u"Remove all passwords", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"<username>", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Log out", None))
@@ -199,7 +200,6 @@ class Ui_MainWindow(object):
         self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Remove", None))
         self.pushButton_2.setText("")
-        self.menuAbout.setTitle(QCoreApplication.translate("MainWindow", u"About", None))
         self.menuRemove_all_saved_passwords.setTitle(QCoreApplication.translate("MainWindow", u"Misc.", None))
     # retranslateUi
 
