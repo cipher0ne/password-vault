@@ -32,7 +32,7 @@ jobs:
             Main.py
       
       - name: Upload Linux artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: PasswordVault-linux
           path: dist/PasswordVault
@@ -63,7 +63,7 @@ jobs:
             Main.py
       
       - name: Upload Windows artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: PasswordVault-windows
           path: dist/PasswordVault.exe
@@ -94,7 +94,7 @@ jobs:
             Main.py
       
       - name: Upload macOS artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: PasswordVault-macos
           path: dist/PasswordVault
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
