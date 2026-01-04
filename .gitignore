@@ -1,1 +1,5 @@
 .venv/
+vault_data.db
+build/
+__pycache__/
+dist/
