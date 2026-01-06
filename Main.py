@@ -8,6 +8,7 @@ os.environ['QT_LINUX_ACCESSIBILITY_ALWAYS_ON'] = '0'
 os.environ['NO_AT_BRIDGE'] = '1'
 
 from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QIcon
 from model.Model import PasswordVaultModel
 from ViewModel.LoginWindow import LoginWindow
 from ViewModel.MainWindow import MainWindow
@@ -16,6 +17,9 @@ from ViewModel.MainWindow import MainWindow
 def main():
     """Main application entry point"""
     app = QApplication(sys.argv)
+    
+    # Set application icon (for taskbar, alt-tab, etc.)
+    app.setWindowIcon(QIcon("icons/app_icon.svg"))
     
     # Create the data model
     model = PasswordVaultModel()

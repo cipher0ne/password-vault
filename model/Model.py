@@ -12,6 +12,23 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 class PasswordVaultModel:
     """Data model for managing users and their password entries using encrypted SQLite"""
+
+    def increment_copy_count(self, index: int) -> None:
+        """Increment the copy_count for a password entry by index"""
+        if not self.current_user:
+            return
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id FROM passwords WHERE user_email = ? ORDER BY custom_order LIMIT 1 OFFSET ?",
+            (self.current_user, index)
+        )
+        result = cursor.fetchone()
+        if result:
+            entry_id = result['id']
+            cursor.execute("UPDATE passwords SET copy_count = copy_count + 1 WHERE id = ?", (entry_id,))
+            conn.commit()
+        conn.close()
     
     @staticmethod
     def _get_data_directory():
@@ -95,6 +112,11 @@ class PasswordVaultModel:
                 FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE
             )
         """)
+        # Add copy_count column to passwords table
+        cursor.execute("PRAGMA table_info(passwords)")
+        columns = [row[1] for row in cursor.fetchall()]
+        if "copy_count" not in columns:
+            cursor.execute("ALTER TABLE passwords ADD COLUMN copy_count INTEGER NOT NULL DEFAULT 0")
         
         # Create index for faster queries
         cursor.execute("""
@@ -198,7 +220,7 @@ class PasswordVaultModel:
         cursor = conn.cursor()
         
         cursor.execute(
-            """SELECT name, username, password, url, custom_order 
+            """SELECT name, username, password, url, custom_order, copy_count 
                FROM passwords WHERE user_email = ? ORDER BY custom_order""",
             (self.current_user,)
         )
@@ -216,7 +238,8 @@ class PasswordVaultModel:
                 'username': row['username'],
                 'password': decrypted_password,
                 'url': row['url'],
-                'custom_order': row['custom_order']
+                'custom_order': row['custom_order'],
+                'copy_count': row['copy_count']
             })
         
         conn.close()
@@ -398,18 +421,17 @@ class PasswordVaultModel:
         if search_query:
             search_pattern = f"%{search_query}%"
             cursor.execute(
-                """SELECT name, username, password, url, custom_order 
+                """SELECT name, username, password, url, custom_order, copy_count 
                    FROM passwords WHERE user_email = ? 
                    AND (name LIKE ? OR username LIKE ? OR url LIKE ?)""",
                 (self.current_user, search_pattern, search_pattern, search_pattern)
             )
         else:
             cursor.execute(
-                """SELECT name, username, password, url, custom_order 
+                """SELECT name, username, password, url, custom_order, copy_count 
                    FROM passwords WHERE user_email = ?""",
                 (self.current_user,)
             )
-        
         entries = []
         for row in cursor.fetchall():
             # Decrypt password before returning
@@ -423,9 +445,9 @@ class PasswordVaultModel:
                 'username': row['username'],
                 'password': decrypted_password,
                 'url': row['url'],
-                'custom_order': row['custom_order']
+                'custom_order': row['custom_order'],
+                'copy_count': row['copy_count']
             })
-        
         conn.close()
         
         # Apply sorting in Python (could be moved to SQL for better performance)
@@ -433,6 +455,8 @@ class PasswordVaultModel:
             entries.sort(key=lambda x: x["name"].lower())
         elif sort_type == "alphabetical_desc":
             entries.sort(key=lambda x: x["name"].lower(), reverse=True)
+        elif sort_type == "frequently_used":
+            entries.sort(key=lambda x: x.get("copy_count", 0), reverse=True)
         else:  # custom
             entries.sort(key=lambda x: x.get("custom_order", 0))
         

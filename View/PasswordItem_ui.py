@@ -24,7 +24,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(386, 140)
+        Form.resize(386, 78)
         self.horizontalLayout_6 = QHBoxLayout(Form)
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.horizontalLayout_2 = QHBoxLayout()
@@ -59,65 +59,6 @@ class Ui_Form(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
-        self.horizontalLayout_4 = QHBoxLayout()
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.label_4 = QLabel(Form)
-        self.label_4.setObjectName(u"label_4")
-
-        self.horizontalLayout_4.addWidget(self.label_4)
-
-        self.label = QLabel(Form)
-        self.label.setObjectName(u"label")
-        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
-        self.label.setSizePolicy(sizePolicy)
-
-        self.horizontalLayout_4.addWidget(self.label)
-
-        self.toolButton = QToolButton(Form)
-        self.toolButton.setObjectName(u"toolButton")
-        icon1 = QIcon()
-        icon1.addFile(u":/icons/icons/copy.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.toolButton.setIcon(icon1)
-        self.toolButton.setAutoRaise(True)
-
-        self.horizontalLayout_4.addWidget(self.toolButton)
-
-
-        self.verticalLayout_2.addLayout(self.horizontalLayout_4)
-
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.label_5 = QLabel(Form)
-        self.label_5.setObjectName(u"label_5")
-
-        self.horizontalLayout_3.addWidget(self.label_5)
-
-        self.label_2 = QLabel(Form)
-        self.label_2.setObjectName(u"label_2")
-        sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
-        self.label_2.setSizePolicy(sizePolicy)
-
-        self.horizontalLayout_3.addWidget(self.label_2)
-
-        self.toolButton_4 = QToolButton(Form)
-        self.toolButton_4.setObjectName(u"toolButton_4")
-        icon2 = QIcon()
-        icon2.addFile(u":/icons/icons/show.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.toolButton_4.setIcon(icon2)
-        self.toolButton_4.setAutoRaise(True)
-
-        self.horizontalLayout_3.addWidget(self.toolButton_4)
-
-        self.toolButton_2 = QToolButton(Form)
-        self.toolButton_2.setObjectName(u"toolButton_2")
-        self.toolButton_2.setIcon(icon1)
-        self.toolButton_2.setAutoRaise(True)
-
-        self.horizontalLayout_3.addWidget(self.toolButton_2)
-
-
-        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
-
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.label_6 = QLabel(Form)
@@ -131,13 +72,6 @@ class Ui_Form(object):
         self.label_3.setSizePolicy(sizePolicy)
 
         self.horizontalLayout_5.addWidget(self.label_3)
-
-        self.toolButton_3 = QToolButton(Form)
-        self.toolButton_3.setObjectName(u"toolButton_3")
-        self.toolButton_3.setIcon(icon1)
-        self.toolButton_3.setAutoRaise(True)
-
-        self.horizontalLayout_5.addWidget(self.toolButton_3)
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
@@ -188,25 +122,8 @@ class Ui_Form(object):
         self.toolButton_5.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>Edit</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.toolButton_5.setText(QCoreApplication.translate("Form", u"...", None))
-        self.label_4.setText(QCoreApplication.translate("Form", u"Login:", None))
-        self.label.setText(QCoreApplication.translate("Form", u"email@foo.bar", None))
-#if QT_CONFIG(tooltip)
-        self.toolButton.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>Copy</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.toolButton.setText(QCoreApplication.translate("Form", u"...", None))
-        self.label_5.setText(QCoreApplication.translate("Form", u"Password:", None))
-        self.label_2.setText(QCoreApplication.translate("Form", u"****************", None))
-        self.toolButton_4.setText(QCoreApplication.translate("Form", u"...", None))
-#if QT_CONFIG(tooltip)
-        self.toolButton_2.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>Copy</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.toolButton_2.setText(QCoreApplication.translate("Form", u"...", None))
         self.label_6.setText(QCoreApplication.translate("Form", u"URL:", None))
         self.label_3.setText(QCoreApplication.translate("Form", u"https://example.com", None))
-#if QT_CONFIG(tooltip)
-        self.toolButton_3.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>Copy</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.toolButton_3.setText(QCoreApplication.translate("Form", u"...", None))
 #if QT_CONFIG(tooltip)
         self.upButton.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>Move up</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)

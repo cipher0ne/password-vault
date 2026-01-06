@@ -5,6 +5,7 @@ from View.MainWindow_ui import Ui_MainWindow
 from ViewModel.PasswordItemWidget import PasswordItemWidget
 from ViewModel.PasswordGeneratorWidget import PasswordGeneratorWidget
 from ViewModel.AboutDialog import AboutDialog
+from ViewModel.ItemPopup import ItemPopupDialog
 
 
 class MainWindow(QMainWindow):
@@ -62,6 +63,7 @@ class MainWindow(QMainWindow):
         self.current_sort = self.settings.value("sortType", "custom", type=str)
         self.search_query = ""
         self.selected_index = -1
+        self.current_popup = None  # Track the currently open popup
         
         # Update UI with user info
         if self.model.current_user:
@@ -132,6 +134,12 @@ class MainWindow(QMainWindow):
         desc_action.setActionGroup(action_group)
         desc_action.triggered.connect(lambda: self.set_sort_type("alphabetical_desc"))
         
+        freq_action = menu.addAction("Frequently Used")
+        freq_action.setCheckable(True)
+        freq_action.setChecked(self.current_sort == "frequently_used")
+        freq_action.setActionGroup(action_group)
+        freq_action.triggered.connect(lambda: self.set_sort_type("frequently_used"))
+        
         # Show menu at button position
         menu.exec(self.ui.pushButton_2.mapToGlobal(self.ui.pushButton_2.rect().bottomLeft()))
     
@@ -154,7 +162,7 @@ class MainWindow(QMainWindow):
         for i, entry in enumerate(entries):
             # Create list item
             item = QListWidgetItem()
-            item.setSizeHint(QSize(0, 120))  # Increased height for more info
+            item.setSizeHint(QSize(0, 80))  # Reduced height since UI is now simpler
             
             # Create custom widget with all data
             widget = PasswordItemWidget(
@@ -162,7 +170,8 @@ class MainWindow(QMainWindow):
                 entry['name'], 
                 entry['username'],
                 entry.get('password', ''),
-                entry.get('url', '')
+                entry.get('url', ''),
+                model=self.model
             )
             
             # Connect signals
@@ -188,10 +197,34 @@ class MainWindow(QMainWindow):
         self.ui.pushButton_3.setEnabled(len(entries) > 0 and self.selected_index >= 0)
     
     def on_item_clicked(self, index: int):
-        """Handle item click"""
+        """Handle item click - show popup with details"""
         self.selected_index = index
         self.list_widget.setCurrentRow(index)
         self.ui.pushButton_3.setEnabled(True)
+        
+        # Close the previous popup if it exists
+        if self.current_popup is not None:
+            self.current_popup.close()
+            self.current_popup = None
+        
+        # Get the entry data
+        entries = self.model.get_sorted_entries(self.current_sort, self.search_query)
+        if index < len(entries):
+            entry = entries[index]
+            
+            # Create and show the popup dialog (non-modal)
+            self.current_popup = ItemPopupDialog(
+                index,
+                entry['name'],
+                entry['username'],
+                entry.get('password', ''),
+                entry.get('url', ''),
+                parent=self,
+                model=self.model
+            )
+            # Connect the close event to clear our reference
+            self.current_popup.finished.connect(lambda: setattr(self, 'current_popup', None))
+            self.current_popup.show()  # Use show() instead of exec() for non-modal dialog
     
     def move_item_up(self, index: int):
         """Move item up in custom order"""

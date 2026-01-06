@@ -1,7 +1,8 @@
-from PySide6.QtWidgets import QWidget, QApplication
-from PySide6.QtCore import Signal, QByteArray, QTimer
+from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import Signal
 from PySide6.QtGui import QIcon, QPixmap, QPainter, QColor
 from PySide6.QtSvg import QSvgRenderer
+from PySide6.QtCore import QByteArray
 from View.PasswordItem_ui import Ui_Form
 import re
 
@@ -14,7 +15,7 @@ class PasswordItemWidget(QWidget):
     item_clicked = Signal(int)
     edit_clicked = Signal(int)  # Emits the index for editing
     
-    def __init__(self, index: int, name: str, username: str, password: str = "", url: str = "", parent=None):
+    def __init__(self, index: int, name: str, username: str, password: str = "", url: str = "", parent=None, model=None):
         super().__init__(parent)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
@@ -24,17 +25,10 @@ class PasswordItemWidget(QWidget):
         self.username = username
         self.password = password
         self.url = url
-        self.password_visible = False
-        
-        # Store original tooltips
-        self.original_tooltip_username = self.ui.toolButton.toolTip()
-        self.original_tooltip_password = self.ui.toolButton_2.toolTip()
-        self.original_tooltip_url = self.ui.toolButton_3.toolTip()
+        self.model = model
         
         # Set the text content
         self.ui.nameLabel.setText(name)
-        self.ui.label.setText(username)  # Username label
-        self.ui.label_2.setText("*" * len(password))  # Password label (hidden)
         self.ui.label_3.setText(url if url else "No URL")  # URL label
         
         # Set theme-aware icons
@@ -43,12 +37,6 @@ class PasswordItemWidget(QWidget):
         # Connect button signals
         self.ui.upButton.clicked.connect(lambda: self.move_up_clicked.emit(self.index))
         self.ui.downButton.clicked.connect(lambda: self.move_down_clicked.emit(self.index))
-        
-        # Connect copy buttons
-        self.ui.toolButton.clicked.connect(self.copy_username)
-        self.ui.toolButton_2.clicked.connect(self.copy_password)
-        self.ui.toolButton_3.clicked.connect(self.copy_url)
-        self.ui.toolButton_4.clicked.connect(self.toggle_password_visibility)
         self.ui.toolButton_5.clicked.connect(lambda: self.edit_clicked.emit(self.index))
         
         # Make the whole widget clickable
@@ -92,67 +80,11 @@ class PasswordItemWidget(QWidget):
         text_color = self.palette().text().color()
         
         # Recolor the custom SVG icons using actual file paths
-        self.copy_icon = self._recolor_svg_icon("icons/copy.svg", text_color)
-        self.show_icon = self._recolor_svg_icon("icons/show.svg", text_color)
-        self.hide_icon = self._recolor_svg_icon("icons/hide.svg", text_color)
         self.edit_icon = self._recolor_svg_icon("icons/edit.svg", text_color)
         
         # Apply the recolored icons
-        if not self.copy_icon.isNull():
-            self.ui.toolButton.setIcon(self.copy_icon)
-            self.ui.toolButton_2.setIcon(self.copy_icon)
-            self.ui.toolButton_3.setIcon(self.copy_icon)
-        
-        if not self.show_icon.isNull():
-            self.ui.toolButton_4.setIcon(self.show_icon)
-        
         if not self.edit_icon.isNull():
             self.ui.toolButton_5.setIcon(self.edit_icon)
-    
-    def _show_copied_tooltip(self, button):
-        """Temporarily show 'Copied!' tooltip"""
-        original_tooltip = button.toolTip()
-        button.setToolTip("✓ Copied!")
-        
-        # Store original to restore later
-        def restore_tooltip():
-            button.setToolTip(original_tooltip if original_tooltip else "")
-        
-        # Reset tooltip after delay
-        QTimer.singleShot(1500, restore_tooltip)
-    
-    def copy_username(self):
-        """Copy username to clipboard"""
-        clipboard = QApplication.clipboard()
-        clipboard.setText(self.username)
-        self._show_copied_tooltip(self.ui.toolButton)
-    
-    def copy_password(self):
-        """Copy password to clipboard"""
-        clipboard = QApplication.clipboard()
-        clipboard.setText(self.password)
-        self._show_copied_tooltip(self.ui.toolButton_2)
-    
-    def copy_url(self):
-        """Copy URL to clipboard"""
-        if self.url:
-            clipboard = QApplication.clipboard()
-            clipboard.setText(self.url)
-            self._show_copied_tooltip(self.ui.toolButton_3)
-    
-    def toggle_password_visibility(self):
-        """Toggle password visibility"""
-        self.password_visible = not self.password_visible
-        if self.password_visible:
-            self.ui.label_2.setText(self.password)
-            if not self.hide_icon.isNull():
-                self.ui.toolButton_4.setIcon(self.hide_icon)
-            self.ui.toolButton_4.setToolTip("Hide password")
-        else:
-            self.ui.label_2.setText("*" * len(self.password))
-            if not self.show_icon.isNull():
-                self.ui.toolButton_4.setIcon(self.show_icon)
-            self.ui.toolButton_4.setToolTip("Show password")
     
     def set_buttons_enabled(self, up_enabled: bool, down_enabled: bool):
         """Enable/disable up and down buttons"""
