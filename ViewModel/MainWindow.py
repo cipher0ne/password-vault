@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(self.ui.pushButton_4)  # Add button
         button_layout.addWidget(self.ui.pushButton_3)  # Remove button
         button_layout.addItem(QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
-        button_layout.addWidget(self.ui.pushButton_2)  # Sort button
+        button_layout.addWidget(self.ui.toolButton)  # Sort button
         vault_layout.addLayout(button_layout)
         
         # Replace QListView with QListWidget
@@ -81,7 +81,7 @@ class MainWindow(QMainWindow):
         self.ui.pushButton.clicked.connect(self.handle_logout)
         self.ui.pushButton_4.clicked.connect(self.add_new_item)
         self.ui.pushButton_3.clicked.connect(self.remove_selected_item)
-        self.ui.pushButton_2.clicked.connect(self.show_sort_menu)
+        self.ui.toolButton.clicked.connect(self.show_sort_menu)
         
         # Connect view switching buttons
         self.ui.pushButton_7.clicked.connect(lambda: self.switch_view(0))  # Vault button
@@ -141,8 +141,10 @@ class MainWindow(QMainWindow):
         text_color = self.palette().color(QPalette.ColorRole.WindowText)
         
         # Recolor and set the sort button icon
-        self.sort_icon = self._recolor_svg_icon("icons/sort.svg", text_color)
-        self.ui.pushButton_2.setIcon(self.sort_icon)
+        self.sort_icon = self._recolor_svg_icon("icons/sort.svg", text_color, size=24)
+        self.ui.toolButton.setIcon(self.sort_icon)
+        # Explicitly set icon size for Windows compatibility
+        self.ui.toolButton.setIconSize(QSize(24, 24))
     
     def switch_view(self, index: int):
         """Switch between vault and password generator views"""
@@ -190,7 +192,7 @@ class MainWindow(QMainWindow):
         freq_action.triggered.connect(lambda: self.set_sort_type("frequently_used"))
         
         # Show menu at button position
-        menu.exec(self.ui.pushButton_2.mapToGlobal(self.ui.pushButton_2.rect().bottomLeft()))
+        menu.exec(self.ui.toolButton.mapToGlobal(self.ui.toolButton.rect().bottomLeft()))
     
     def set_sort_type(self, sort_type: str):
         """Set the sorting type and refresh list"""

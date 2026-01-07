@@ -19,7 +19,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QHBoxLayout, QLabel,
     QLineEdit, QListView, QMainWindow, QMenu,
     QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
-    QVBoxLayout, QWidget)
+    QToolButton, QVBoxLayout, QWidget)
 import icons_rc
 
 class Ui_MainWindow(object):
@@ -29,6 +29,9 @@ class Ui_MainWindow(object):
         MainWindow.setEnabled(True)
         MainWindow.resize(362, 534)
         MainWindow.setMinimumSize(QSize(362, 534))
+        icon = QIcon()
+        icon.addFile(u":/icons/icons/app_icon_32.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        MainWindow.setWindowIcon(icon)
         self.actionAbout = QAction(MainWindow)
         self.actionAbout.setObjectName(u"actionAbout")
         self.actionRemove_all_passwords = QAction(MainWindow)
@@ -139,13 +142,13 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_3)
 
-        self.pushButton_2 = QPushButton(self.centralwidget)
-        self.pushButton_2.setObjectName(u"pushButton_2")
-        icon = QIcon()
-        icon.addFile(u":/icons/icons/sort.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.pushButton_2.setIcon(icon)
+        self.toolButton = QToolButton(self.centralwidget)
+        self.toolButton.setObjectName(u"toolButton")
+        icon1 = QIcon()
+        icon1.addFile(u":/icons/icons/sort.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.toolButton.setIcon(icon1)
 
-        self.horizontalLayout_4.addWidget(self.pushButton_2)
+        self.horizontalLayout_4.addWidget(self.toolButton)
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
@@ -201,7 +204,7 @@ class Ui_MainWindow(object):
         self.lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search", None))
         self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Remove", None))
-        self.pushButton_2.setText("")
+        self.toolButton.setText(QCoreApplication.translate("MainWindow", u"...", None))
         self.menuRemove_all_saved_passwords.setTitle(QCoreApplication.translate("MainWindow", u"Misc.", None))
     # retranslateUi
 

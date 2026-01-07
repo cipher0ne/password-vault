@@ -13,24 +13,42 @@ from model.Model import PasswordVaultModel
 from ViewModel.LoginWindow import LoginWindow
 from ViewModel.MainWindow import MainWindow
 import platform
+import icons_rc  # Import compiled resources
 
 
 def get_app_icon():
     """Get appropriate icon format for the platform"""
     if platform.system() == "Windows":
         # Use ICO on Windows for best compatibility
-        return QIcon("icons/app_icon.ico")
+        # Try resource path first, then fallback to filesystem
+        icon = QIcon(":/icons/icons/app_icon.ico")
+        if not icon.isNull():
+            return icon
+        # Fallback to filesystem path
+        icon = QIcon()
+        for size in [16, 32, 48, 64, 128, 256]:
+            icon.addFile(f":/icons/icons/app_icon_{size}.png")
+        return icon
     else:
         # Use PNG on Linux/macOS for better quality
         icon = QIcon()
         # Add multiple sizes for better rendering at different DPIs
         for size in [16, 32, 48, 64, 128, 256]:
-            icon.addFile(f"icons/app_icon_{size}.png")
+            icon.addFile(f":/icons/icons/app_icon_{size}.png")
         return icon
 
 
 def main():
     """Main application entry point"""
+    # Windows-specific: Set AppUserModelID to ensure taskbar icon works
+    if platform.system() == "Windows":
+        try:
+            import ctypes
+            myappid = 'com.passwordvault.app.1.0'  # Arbitrary string
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        except:
+            pass
+    
     app = QApplication(sys.argv)
     
     # Set application icon (for taskbar, alt-tab, etc.)

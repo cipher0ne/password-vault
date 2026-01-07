@@ -18,6 +18,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel,
     QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
     QVBoxLayout, QWidget)
+import icons_rc
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -25,6 +26,9 @@ class Ui_Dialog(object):
             Dialog.setObjectName(u"Dialog")
         Dialog.resize(269, 371)
         Dialog.setMinimumSize(QSize(269, 370))
+        icon = QIcon()
+        icon.addFile(u":/icons/icons/app_icon_32.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        Dialog.setWindowIcon(icon)
         self.horizontalLayout_3 = QHBoxLayout(Dialog)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.horizontalLayout_2 = QHBoxLayout()

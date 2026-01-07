@@ -26,6 +26,9 @@ class Ui_Dialog(object):
             Dialog.setObjectName(u"Dialog")
         Dialog.resize(330, 164)
         Dialog.setMinimumSize(QSize(330, 164))
+        icon = QIcon()
+        icon.addFile(u":/icons/icons/app_icon_32.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        Dialog.setWindowIcon(icon)
         self.verticalLayout_2 = QVBoxLayout(Dialog)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout = QVBoxLayout()
@@ -65,9 +68,9 @@ class Ui_Dialog(object):
 
         self.toolButton = QToolButton(Dialog)
         self.toolButton.setObjectName(u"toolButton")
-        icon = QIcon()
-        icon.addFile(u":/icons/icons/copy.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.toolButton.setIcon(icon)
+        icon1 = QIcon()
+        icon1.addFile(u":/icons/icons/copy.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.toolButton.setIcon(icon1)
         self.toolButton.setAutoRaise(True)
 
         self.horizontalLayout_4.addWidget(self.toolButton)
@@ -92,16 +95,16 @@ class Ui_Dialog(object):
 
         self.toolButton_4 = QToolButton(Dialog)
         self.toolButton_4.setObjectName(u"toolButton_4")
-        icon1 = QIcon()
-        icon1.addFile(u":/icons/icons/show.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.toolButton_4.setIcon(icon1)
+        icon2 = QIcon()
+        icon2.addFile(u":/icons/icons/show.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.toolButton_4.setIcon(icon2)
         self.toolButton_4.setAutoRaise(True)
 
         self.horizontalLayout_3.addWidget(self.toolButton_4)
 
         self.toolButton_2 = QToolButton(Dialog)
         self.toolButton_2.setObjectName(u"toolButton_2")
-        self.toolButton_2.setIcon(icon)
+        self.toolButton_2.setIcon(icon1)
         self.toolButton_2.setAutoRaise(True)
 
         self.horizontalLayout_3.addWidget(self.toolButton_2)
@@ -125,7 +128,7 @@ class Ui_Dialog(object):
 
         self.toolButton_3 = QToolButton(Dialog)
         self.toolButton_3.setObjectName(u"toolButton_3")
-        self.toolButton_3.setIcon(icon)
+        self.toolButton_3.setIcon(icon1)
         self.toolButton_3.setAutoRaise(True)
 
         self.horizontalLayout_5.addWidget(self.toolButton_3)

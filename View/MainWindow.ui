@@ -22,6 +22,10 @@
   <property name="windowTitle">
    <string>Password Vault</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../icons.qrc">
+    <normaloff>:/icons/icons/app_icon_32.png</normaloff>:/icons/icons/app_icon_32.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_5">
     <item>
@@ -225,9 +229,9 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_2">
+             <widget class="QToolButton" name="toolButton">
               <property name="text">
-               <string/>
+               <string>...</string>
               </property>
               <property name="icon">
                <iconset resource="../icons.qrc">
