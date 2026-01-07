@@ -73,40 +73,8 @@ jobs:
           name: PasswordVault-windows
           path: dist/PasswordVault.exe
 
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-      
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
-      
-      - name: Build macOS executable
-        run: |
-          pyinstaller --name="PasswordVault" \
-            --windowed \
-            --onefile \
-            --icon="icons/app_icon_256.png" \
-            --add-data "icons:icons" \
-            --add-data "View/*.ui:View" \
-            Main.py
-      
-      - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: PasswordVault-macos
-          path: dist/PasswordVault
-
   create-release:
-    needs: [build-linux, build-windows, build-macos]
+    needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -119,7 +87,6 @@ jobs:
       - name: Rename artifacts with platform names
         run: |
           mv artifacts/PasswordVault-linux/PasswordVault artifacts/PasswordVault-linux/PasswordVault-linux
-          mv artifacts/PasswordVault-macos/PasswordVault artifacts/PasswordVault-macos/PasswordVault-macos
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -127,7 +94,6 @@ jobs:
           files: |
             artifacts/PasswordVault-linux/PasswordVault-linux
             artifacts/PasswordVault-windows/PasswordVault.exe
-            artifacts/PasswordVault-macos/PasswordVault-macos
           draft: false
           prerelease: false
         env:
