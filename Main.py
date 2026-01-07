@@ -12,6 +12,21 @@ from PySide6.QtGui import QIcon
 from model.Model import PasswordVaultModel
 from ViewModel.LoginWindow import LoginWindow
 from ViewModel.MainWindow import MainWindow
+import platform
+
+
+def get_app_icon():
+    """Get appropriate icon format for the platform"""
+    if platform.system() == "Windows":
+        # Use ICO on Windows for best compatibility
+        return QIcon("icons/app_icon.ico")
+    else:
+        # Use PNG on Linux/macOS for better quality
+        icon = QIcon()
+        # Add multiple sizes for better rendering at different DPIs
+        for size in [16, 32, 48, 64, 128, 256]:
+            icon.addFile(f"icons/app_icon_{size}.png")
+        return icon
 
 
 def main():
@@ -19,13 +34,15 @@ def main():
     app = QApplication(sys.argv)
     
     # Set application icon (for taskbar, alt-tab, etc.)
-    app.setWindowIcon(QIcon("icons/app_icon.svg"))
+    app_icon = get_app_icon()
+    app.setWindowIcon(app_icon)
     
     # Create the data model
     model = PasswordVaultModel()
     
     # Create and show login window
     login_window = LoginWindow(model)
+    login_window.setWindowIcon(app_icon)
     
     # Keep reference to main window to prevent garbage collection
     main_window = None

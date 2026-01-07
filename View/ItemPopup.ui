@@ -203,7 +203,7 @@
        <item>
         <widget class="QPushButton" name="pushButton">
          <property name="text">
-          <string>CLose</string>
+          <string>Close</string>
          </property>
         </widget>
        </item>

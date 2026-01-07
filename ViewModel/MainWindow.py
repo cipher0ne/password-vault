@@ -1,11 +1,13 @@
-from PySide6.QtWidgets import QMainWindow, QMessageBox, QListWidget, QListWidgetItem, QMenu, QStackedWidget, QWidget, QVBoxLayout, QHBoxLayout, QSpacerItem, QSizePolicy
-from PySide6.QtCore import QSize, Signal, QSettings
-from PySide6.QtGui import QActionGroup
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QListWidget, QListWidgetItem, QMenu, QStackedWidget, QWidget, QVBoxLayout, QHBoxLayout, QSpacerItem, QSizePolicy, QApplication
+from PySide6.QtCore import QSize, Signal, QSettings, QByteArray
+from PySide6.QtGui import QActionGroup, QIcon, QPixmap, QPalette, QColor
+from PySide6.QtSvg import QSvgRenderer
 from View.MainWindow_ui import Ui_MainWindow
 from ViewModel.PasswordItemWidget import PasswordItemWidget
 from ViewModel.PasswordGeneratorWidget import PasswordGeneratorWidget
 from ViewModel.AboutDialog import AboutDialog
 from ViewModel.ItemPopup import ItemPopupDialog
+import re
 
 
 class MainWindow(QMainWindow):
@@ -19,6 +21,9 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.model = model
         self.settings = QSettings("PasswordVault", "MainWindow")
+        
+        # Set window icon from application icon
+        self.setWindowIcon(QApplication.instance().windowIcon())
         
         # Create stacked widget to replace verticalLayout_2 content
         self.stacked_widget = QStackedWidget()
@@ -69,6 +74,9 @@ class MainWindow(QMainWindow):
         if self.model.current_user:
             self.ui.label_2.setText(self.model.current_user)
         
+        # Apply theme-aware icons
+        self._apply_themed_icons()
+        
         # Connect buttons
         self.ui.pushButton.clicked.connect(self.handle_logout)
         self.ui.pushButton_4.clicked.connect(self.add_new_item)
@@ -94,6 +102,47 @@ class MainWindow(QMainWindow):
         
         # Center the window on screen
         self.center_window()
+    
+    def _recolor_svg_icon(self, svg_path: str, color: QColor, size: int = 24) -> QIcon:
+        """Recolor an SVG icon to match the theme"""
+        try:
+            with open(svg_path, 'r') as f:
+                svg_content = f.read()
+            
+            # Replace all fill colors in the SVG with the theme color
+            color_hex = color.name()
+            svg_content = re.sub(r'fill="[^"]*"', f'fill="{color_hex}"', svg_content)
+            svg_content = re.sub(r'stroke="[^"]*"', f'stroke="{color_hex}"', svg_content)
+            
+            # If no fill/stroke attributes, add fill to the svg tag
+            if 'fill=' not in svg_content:
+                svg_content = svg_content.replace('<svg', f'<svg fill="{color_hex}"')
+            
+            # Render the modified SVG
+            svg_bytes = QByteArray(svg_content.encode('utf-8'))
+            renderer = QSvgRenderer(svg_bytes)
+            
+            pixmap = QPixmap(QSize(size, size))
+            pixmap.fill(0x00000000)  # Transparent background
+            
+            from PySide6.QtGui import QPainter
+            painter = QPainter(pixmap)
+            renderer.render(painter)
+            painter.end()
+            
+            return QIcon(pixmap)
+        except Exception as e:
+            print(f"Error recoloring icon {svg_path}: {e}")
+            return QIcon()
+    
+    def _apply_themed_icons(self):
+        """Apply theme-aware coloring to SVG icons"""
+        # Get the current text color from the palette
+        text_color = self.palette().color(QPalette.ColorRole.WindowText)
+        
+        # Recolor and set the sort button icon
+        self.sort_icon = self._recolor_svg_icon("icons/sort.svg", text_color)
+        self.ui.pushButton_2.setIcon(self.sort_icon)
     
     def switch_view(self, index: int):
         """Switch between vault and password generator views"""

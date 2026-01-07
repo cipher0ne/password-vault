@@ -230,7 +230,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset theme="QIcon::ThemeIcon::FormatJustifyFill"/>
+               <iconset resource="../icons.qrc">
+                <normaloff>:/icons/icons/sort.svg</normaloff>:/icons/icons/sort.svg</iconset>
               </property>
              </widget>
             </item>
@@ -296,7 +297,9 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../icons.qrc"/>
+ </resources>
  <connections/>
  <buttongroups>
   <buttongroup name="buttonGroup">

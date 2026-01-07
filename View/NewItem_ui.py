@@ -157,6 +157,6 @@ class Ui_Dialog(object):
         self.groupBox_4.setTitle(QCoreApplication.translate("Dialog", u"Website (URL)", None))
         self.lineEdit_4.setText("")
         self.pushButton_2.setText(QCoreApplication.translate("Dialog", u"Cancel", None))
-        self.pushButton.setText(QCoreApplication.translate("Dialog", u"Ok", None))
+        self.pushButton.setText(QCoreApplication.translate("Dialog", u"OK", None))
     # retranslateUi
 

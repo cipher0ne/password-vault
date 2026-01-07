@@ -178,6 +178,6 @@ class Ui_Dialog(object):
         self.toolButton_3.setToolTip(QCoreApplication.translate("Dialog", u"<html><head/><body><p>Copy</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.toolButton_3.setText(QCoreApplication.translate("Dialog", u"...", None))
-        self.pushButton.setText(QCoreApplication.translate("Dialog", u"CLose", None))
+        self.pushButton.setText(QCoreApplication.translate("Dialog", u"Close", None))
     # retranslateUi
 

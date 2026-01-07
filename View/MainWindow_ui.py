@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QHBoxLayout, QLabel,
     QLineEdit, QListView, QMainWindow, QMenu,
     QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
     QVBoxLayout, QWidget)
+import icons_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -140,7 +141,8 @@ class Ui_MainWindow(object):
 
         self.pushButton_2 = QPushButton(self.centralwidget)
         self.pushButton_2.setObjectName(u"pushButton_2")
-        icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.FormatJustifyFill))
+        icon = QIcon()
+        icon.addFile(u":/icons/icons/sort.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.pushButton_2.setIcon(icon)
 
         self.horizontalLayout_4.addWidget(self.pushButton_2)

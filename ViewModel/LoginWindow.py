@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QDialog, QMessageBox
+from PySide6.QtWidgets import QDialog, QMessageBox, QApplication
 from PySide6.QtCore import Signal, QSettings
 from View.LoginWindow_ui import Ui_Dialog
 
@@ -14,6 +14,10 @@ class LoginWindow(QDialog):
         self.ui.setupUi(self)
         self.model = model
         self.settings = QSettings("PasswordVault", "LoginPreferences")
+        
+        # Set window icon from application icon
+        if not parent:
+            self.setWindowIcon(QApplication.instance().windowIcon())
         
         # Connect buttons
         self.ui.pushButton.clicked.connect(self.handle_login)

@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QDialog, QMessageBox
+from PySide6.QtWidgets import QDialog, QMessageBox, QApplication
 from PySide6.QtCore import Signal
 from View.SignUpWindow_ui import Ui_Dialog
 import re
@@ -14,6 +14,10 @@ class SignUpWindow(QDialog):
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.model = model
+        
+        # Set window icon from application icon
+        if not parent:
+            self.setWindowIcon(QApplication.instance().windowIcon())
         
         # Connect buttons
         self.ui.pushButton.clicked.connect(self.handle_signup)

@@ -4,5 +4,6 @@
     <file>icons/hide.svg</file>
     <file>icons/show.svg</file>
     <file>icons/edit.svg</file>
+    <file>icons/sort.svg</file>
   </qresource>
 </RCC>
